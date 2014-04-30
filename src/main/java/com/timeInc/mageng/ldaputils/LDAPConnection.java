@@ -1,5 +1,6 @@
 /**
  * Utility class to authenticate against AD
+ * and get list of groups the authenticated user belongs to.
  */
 package com.timeInc.mageng.ldaputils;
 
