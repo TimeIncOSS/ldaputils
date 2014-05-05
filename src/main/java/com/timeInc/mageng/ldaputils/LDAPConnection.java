@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright 2014 Time Inc
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+
+
 /**
  * Utility class to authenticate against AD
  * and get list of groups the authenticated user belongs to.
@@ -153,20 +170,4 @@ public class LDAPConnection {
 		}
 		return null;
 	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		LDAPUser user = LDAPConnection.loginUser("ldap://corp.ad.timeinc.com:389", "time-inc-corp",
-				"OU=time inc.,DC=corp,DC=ad,DC=timeinc,DC=com", 
-				null, null, "apradhan1271", "password", true);
-		System.out.println(user.getCommonName());
-		System.out.println(user.getUsername());
-		System.out.println(user.getEmail());
-		for (String group : user.getGroups()){
-			System.out.println(group);
-		}
-	}
-
 }
