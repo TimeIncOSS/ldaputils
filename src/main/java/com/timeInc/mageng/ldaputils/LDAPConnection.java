@@ -1,20 +1,3 @@
-/*******************************************************************************
- * Copyright 2014 Time Inc
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
-
 /**
  * Utility class to authenticate against AD
  * and get list of groups the authenticated user belongs to.
@@ -50,6 +33,7 @@ public class LDAPConnection {
 	private static final String SECURITY_AUTHENTICATION = "simple";
 	private static final String SAMACCOUNTNAME_PARAM = "sAMAccountName=";
 	private static final String[] PERSON_RETURN_ATRRIBUTES = {"CN", "sAMAccountName", "mail", "memberOf"};
+//	private static final String[] PERSON_RETURN_ATRRIBUTES ={"*"};
 	private static final String GROUP_FILTER = "objectClass=group";
 	
 	private static final String ADVAR_MEMBEROF = "memberOf";
@@ -84,10 +68,12 @@ public class LDAPConnection {
 		env.put(Context.SECURITY_AUTHENTICATION, SECURITY_AUTHENTICATION);
 		env.put(Context.SECURITY_PRINCIPAL, domain + "\\" + username);
 		env.put(Context.SECURITY_CREDENTIALS, password);
-		
+				
 		try {
 			new InitialDirContext(env);
 			/* login was successful, now let's get list of groups for the user */
+			env.put(Context.REFERRAL, "follow");
+			
 			LdapContext context = new InitialLdapContext(env,null);
 			SearchControls searchCtls = new SearchControls();
 			searchCtls.setReturningObjFlag(true);
@@ -105,8 +91,21 @@ public class LDAPConnection {
 			NamingEnumeration<SearchResult> ne = context.search(userSearchBase, filter, searchCtls);
 			while (ne.hasMore()) {
 				SearchResult sr = (SearchResult)ne.next();
+				
 				name = sr.getAttributes().get(ADVAR_COMMON_NAME).toString();
-				email = sr.getAttributes().get(ADVAR_MEMBEROF) != null ? sr.getAttributes().get(ADVAR_EMAIL).toString() : "";
+				// name may come in as cn:first last
+				String temp[] = name.split(":");
+				if (temp.length > 1) {
+					name = temp[1].trim();
+				}
+				
+				email = sr.getAttributes().get(ADVAR_MEMBEROF) != null && sr.getAttributes().get(ADVAR_EMAIL) != null 
+							? sr.getAttributes().get(ADVAR_EMAIL).toString() : "";
+				// email may come like mail: ashim_pradhan@timeinc.com
+				String temp1[] = email.split(":");
+				if (temp1.length > 1) {
+					email = temp1[1].trim();
+				}
 				Attribute aMemberOf = sr.getAttributes().get(ADVAR_MEMBEROF);
 				if (aMemberOf != null) {
 					for (NamingEnumeration<?> e = aMemberOf.getAll(); e.hasMore(); ) {
@@ -170,4 +169,21 @@ public class LDAPConnection {
 		}
 		return null;
 	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		LDAPUser user = LDAPConnection.loginUser("ldap://corp.ad.timeinc.com:389", "time-inc-corp",
+				"DC=CORP,DC=AD,DC=TIMEINC,DC=com", 
+				null, null, "apradhan1271", "", false);
+		System.out.println(user.getCommonName());
+		System.out.println(user.getUsername());
+		System.out.println(user.getEmail());
+		for (String group : user.getGroups()){
+			System.out.println(group);
+		}
+	}
+
 }
+
