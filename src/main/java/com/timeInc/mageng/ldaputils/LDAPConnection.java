@@ -161,7 +161,7 @@ public class LDAPConnection {
 				for (NamingEnumeration<?> e1 = memberOf.getAll(); e1.hasMore(); ) {
 					String nestedGroup = (String) e1.next();
 					groups.add(getOnlyGroupCN(nestedGroup));
-					/* recursing all nested groups takes too long, going only one level down uncomment to go deeper
+					/* recursing all nested groups takes too long, going only one level down un-comment to go deeper
 					getNestedGroups(env, nestedGroup, groups, context, searchCtls);
 					*/
 				}
@@ -185,7 +185,6 @@ public class LDAPConnection {
 		}
 		return null;
 	}
-
 
 }
 
