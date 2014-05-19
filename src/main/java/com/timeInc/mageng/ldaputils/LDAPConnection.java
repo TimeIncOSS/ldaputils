@@ -170,20 +170,6 @@ public class LDAPConnection {
 		return null;
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		LDAPUser user = LDAPConnection.loginUser("ldap://corp.ad.timeinc.com:389", "time-inc-corp",
-				"DC=CORP,DC=AD,DC=TIMEINC,DC=com", 
-				null, null, "apradhan1271", "", false);
-		System.out.println(user.getCommonName());
-		System.out.println(user.getUsername());
-		System.out.println(user.getEmail());
-		for (String group : user.getGroups()){
-			System.out.println(group);
-		}
-	}
 
 }
 
